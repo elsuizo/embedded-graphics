@@ -62,17 +62,15 @@ fn draw_perp(
 
 fn draw_perp2(
     display: &mut RgbDisplay,
-    p: Point,
+    p_start: Point,
     delta: Point,
     direction: Point,
     initial_error: i32,
     width: i32,
     color: Rgb888,
 ) {
-    let mut p = p;
+    let mut p = p_start;
     let mut error = initial_error;
-
-    let width_threshold_sq = 4 * width.pow(2) * (delta.x.pow(2) + delta.y.pow(2));
 
     for _ in 0..width {
         display.set_pixel(p.x as usize, p.y as usize, color);
@@ -81,11 +79,13 @@ fn draw_perp2(
 
         if e_double > delta.y {
             error += delta.y;
+
             p -= Point::new(0, direction.y);
         }
 
         if e_double < delta.x {
             error += delta.x;
+
             p += Point::new(direction.x, 0);
         }
     }
@@ -101,13 +101,6 @@ fn draw_line(display: &mut RgbDisplay, p0: Point, p1: Point, width: i32) {
         delta = Point::new(delta.x, -delta.y);
     }
 
-    // let direction = match (delta.x < 0, delta.y < 0) {
-    //     (false, false) => Point::new(1, 1),
-    //     (false, true) => Point::new(1, -1),
-    //     (true, false) => Point::new(-1, 1),
-    //     (true, true) => Point::new(-1, -1),
-    // };
-
     let direction = match (p0.x >= p1.x, p0.y >= p1.y) {
         (false, false) => Point::new(1, 1),
         (false, true) => Point::new(1, -1),
@@ -116,20 +109,10 @@ fn draw_line(display: &mut RgbDisplay, p0: Point, p1: Point, width: i32) {
     };
 
     let mut error = delta.x + delta.y;
-    // Perpendicular error
-    let mut p_error = 0;
 
     let mut p = p0;
 
-    let threshold = delta.x - 2 * delta.y;
-
-    let e_diag = -2 * delta.x;
-    let e_square = 2 * delta.y;
-
-    // for _ in 0..=delta.x.abs().max(delta.y.abs()) {
     while p != p1 {
-        // draw_perp(display, p, delta, direction, p_error, width, error);
-
         draw_perp2(display, p, delta, direction, error, width, Rgb888::YELLOW);
 
         display.set_pixel(p.x as usize, p.y as usize, Rgb888::WHITE);
