@@ -6,60 +6,6 @@ use embedded_graphics_simulator::RgbDisplay;
 use std::thread;
 use std::time::Duration;
 
-fn draw_perp(
-    display: &mut RgbDisplay,
-    start: Point,
-    delta: Point,
-    direction: Point,
-    p_error_initial: i32,
-    width: i32,
-    error_initial: i32,
-) {
-    let mut error = p_error_initial;
-    let mut p = start;
-
-    let threshold = delta.x - 2 * delta.y;
-
-    let width_threshold_sq = 4 * width.pow(2) * (delta.x.pow(2) + delta.y.pow(2));
-
-    let e_diag = -2 * delta.x;
-    let e_square = 2 * delta.y;
-
-    let mut width_accum = delta.x + delta.y - error_initial;
-
-    while width_accum.pow(2) <= width_threshold_sq {
-        display.set_pixel(p.x as usize, p.y as usize, Rgb888::RED);
-
-        if error > threshold {
-            p -= Point::new(direction.x, 0);
-            error += e_diag;
-            width_accum += 2 * delta.y;
-        }
-
-        error += e_square;
-        p += Point::new(0, direction.y);
-        width_accum += 2 * delta.x;
-    }
-
-    let mut width_accum = delta.x + delta.y + error_initial;
-    let mut error = -p_error_initial;
-    let mut p = start;
-
-    while width_accum.pow(2) <= width_threshold_sq {
-        display.set_pixel(p.x as usize, p.y as usize, Rgb888::GREEN);
-
-        if error > threshold {
-            p.x += 1;
-            error += e_diag;
-            width_accum += 2 * delta.y;
-        }
-
-        error += e_square;
-        p.y -= 1;
-        width_accum += 2 * delta.x;
-    }
-}
-
 fn draw_perp2(
     display: &mut RgbDisplay,
     p_start: Point,
@@ -141,36 +87,10 @@ fn draw_line(display: &mut RgbDisplay, p0: Point, p1: Point, width: i32) {
             error += delta.x;
             p += Point::new(0, direction.y);
         }
-
-        // if error > threshold {
-        //     // p.y += 1;
-        //     p += Point::new(0, direction.y);
-        //     error += e_diag;
-
-        //     if p_error > threshold {
-        //         p_error += e_diag;
-
-        //         // draw_perp(
-        //         //     display,
-        //         //     p,
-        //         //     delta,
-        //         //     direction,
-        //         //     p_error + e_square,
-        //         //     width,
-        //         //     error,
-        //         // );
-        //     }
-
-        //     p_error += e_square;
-        // }
-
-        // error += e_square;
-        // // p.x += 1;
-        // p += Point::new(direction.x, 0);
     }
 
     // Draw center line using existing e-g `Line`
-    // display.draw(egline!(p0, p1, stroke_color = Some(Rgb888::WHITE)));
+    display.draw(egline!(p0, p1, stroke_color = Some(Rgb888::WHITE)));
 }
 
 fn main() {
