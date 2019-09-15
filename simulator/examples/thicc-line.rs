@@ -68,21 +68,13 @@ fn draw_line(display: &mut RgbDisplay, p0: Point, p1: Point, width: i32) {
     while p != p1 {
         draw_perp2(display, p, delta, direction, error, width, Rgb888::YELLOW);
 
-        display.set_pixel(p.x as usize, p.y as usize, Rgb888::WHITE);
-
         let e_double = error * 2;
 
         if e_double > delta.y {
-            draw_perp2(
-                display,
-                p,
-                delta,
-                direction,
-                error + delta.y,
-                width,
-                Rgb888::YELLOW,
-            );
             error += delta.y;
+
+            draw_perp2(display, p, delta, direction, error, width, Rgb888::YELLOW);
+
             p += Point::new(direction.x, 0);
         }
 
