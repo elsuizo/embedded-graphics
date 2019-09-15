@@ -72,7 +72,11 @@ fn draw_perp2(
     let mut p = p_start;
     let mut error = initial_error;
 
-    for _ in 0..width {
+    let len = (delta.x.pow(2) as f32 + delta.y.pow(2) as f32).sqrt() as i32;
+
+    let width = delta.x.abs().max(delta.y.abs()) * width as i32;
+
+    for _ in (0..width).step_by(len as usize) {
         display.set_pixel(p.x as usize, p.y as usize, color);
 
         let e_double = error * 2;
