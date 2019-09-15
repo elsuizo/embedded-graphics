@@ -60,6 +60,37 @@ fn draw_perp(
     }
 }
 
+fn draw_perp2(
+    display: &mut RgbDisplay,
+    p: Point,
+    delta: Point,
+    direction: Point,
+    initial_error: i32,
+    width: i32,
+    color: Rgb888,
+) {
+    let mut p = p;
+    let mut error = initial_error;
+
+    let width_threshold_sq = 4 * width.pow(2) * (delta.x.pow(2) + delta.y.pow(2));
+
+    for _ in 0..width {
+        display.set_pixel(p.x as usize, p.y as usize, color);
+
+        let e_double = error * 2;
+
+        if e_double > delta.y {
+            error += delta.y;
+            p -= Point::new(0, direction.y);
+        }
+
+        if e_double < delta.x {
+            error += delta.x;
+            p += Point::new(direction.x, 0);
+        }
+    }
+}
+
 fn draw_line(display: &mut RgbDisplay, p0: Point, p1: Point, width: i32) {
     let mut delta = p1 - p0;
 
@@ -99,11 +130,22 @@ fn draw_line(display: &mut RgbDisplay, p0: Point, p1: Point, width: i32) {
     while p != p1 {
         // draw_perp(display, p, delta, direction, p_error, width, error);
 
-        display.set_pixel(p.x as usize, p.y as usize, Rgb888::MAGENTA);
+        draw_perp2(display, p, delta, direction, error, width, Rgb888::YELLOW);
+
+        display.set_pixel(p.x as usize, p.y as usize, Rgb888::WHITE);
 
         let e_double = error * 2;
 
         if e_double > delta.y {
+            draw_perp2(
+                display,
+                p,
+                delta,
+                direction,
+                error + delta.y,
+                width,
+                Rgb888::YELLOW,
+            );
             error += delta.y;
             p += Point::new(direction.x, 0);
         }
