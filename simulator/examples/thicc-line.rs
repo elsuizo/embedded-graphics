@@ -3,6 +3,7 @@ use embedded_graphics::pixelcolor::Rgb888;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::DisplayBuilder;
 use embedded_graphics_simulator::RgbDisplay;
+use integer_sqrt::IntegerSquareRoot;
 use std::thread;
 use std::time::Duration;
 
@@ -18,8 +19,11 @@ fn draw_perp2(
     let mut p = p_start;
     let mut error = initial_error;
 
-    let len = ((delta.x.pow(2) + delta.y.pow(2)) as f32).sqrt() as i32;
+    let old_len = ((delta.x.pow(2) + delta.y.pow(2)) as f32).sqrt() as i32;
+    let len = (delta.x.pow(2) + delta.y.pow(2)).integer_sqrt();
     let width = delta.x.abs().max(delta.y.abs()) * width;
+
+    assert_eq!(old_len, len);
 
     for _ in (0..width).step_by(len as usize) {
         display.set_pixel(p.x as usize, p.y as usize, color);
